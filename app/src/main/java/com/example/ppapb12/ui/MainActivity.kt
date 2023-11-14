@@ -18,6 +18,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mNotesDao: NoteDao
     private lateinit var executorService: ExecutorService
     private var updateId: Int=0
+    private var noteToDelete: Note? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,12 +53,23 @@ class MainActivity : AppCompatActivity() {
                 updateId = 0
                 setEmptyField()
             }
+
+            btnDelete.setOnClickListener {
+                // Assuming you have the note you want to delete stored in a variable called "noteToDelete"
+                noteToDelete?.let {
+                    delete(it)
+                    noteToDelete = null // Reset the noteToDelete after deletion
+                    setEmptyField()
+                }
+            }
+
             listView.setOnItemClickListener { adapterView, _, i, _ ->
                 val item = adapterView.adapter.getItem(i) as Note
                 updateId = item.id
                 edtTitle.setText(item.title)
                 edtDesc.setText(item.description)
                 edtDate.setText(item.date)
+                noteToDelete = item
             }
             listView.onItemLongClickListener =
                 AdapterView.OnItemLongClickListener { adapterView, _, i, _ ->
