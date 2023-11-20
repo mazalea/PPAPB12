@@ -1,5 +1,6 @@
 package com.example.ppapb12.ui
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -32,14 +33,18 @@ class MainActivity : AppCompatActivity() {
 
         with(binding){
             btnAdd.setOnClickListener(View.OnClickListener {
-                insert(
-                    Note(
-                        title = edtTitle.text.toString(),
-                        description = edtDesc.text.toString(),
-                        date = edtDate.text.toString()
-                    )
+                val note = Note(
+                    title = edtTitle.text.toString(),
+                    description = edtDesc.text.toString(),
+                    date = edtDate.text.toString()
                 )
+                insert(note)
                 setEmptyField()
+
+                // Send data to the ListViewActivity using Intent
+                val intent = Intent(this@MainActivity, NoteListActivity::class.java)
+                intent.putExtra("NOTE_DATA", note)
+                startActivity(intent)
             })
             btnUpdate.setOnClickListener {
                 update(
@@ -63,32 +68,32 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            listView.setOnItemClickListener { adapterView, _, i, _ ->
-                val item = adapterView.adapter.getItem(i) as Note
-                updateId = item.id
-                edtTitle.setText(item.title)
-                edtDesc.setText(item.description)
-                edtDate.setText(item.date)
-                noteToDelete = item
-            }
-            listView.onItemLongClickListener =
-                AdapterView.OnItemLongClickListener { adapterView, _, i, _ ->
-                    val item = adapterView.adapter.getItem(i) as Note
-                    delete(item)
-                    true
-                }
+//            listView.setOnItemClickListener { adapterView, _, i, _ ->
+//                val item = adapterView.adapter.getItem(i) as Note
+//                updateId = item.id
+//                edtTitle.setText(item.title)
+//                edtDesc.setText(item.description)
+//                edtDate.setText(item.date)
+//                noteToDelete = item
+//            }
+//            listView.onItemLongClickListener =
+//                AdapterView.OnItemLongClickListener { adapterView, _, i, _ ->
+//                    val item = adapterView.adapter.getItem(i) as Note
+//                    delete(item)
+//                    true
+//                }
         }
     }
 
-    private fun getAllNotes() {
-        mNotesDao.allNotes.observe(this) { notes ->
-            val adapter: ArrayAdapter<Note> = ArrayAdapter<Note>(
-                this,
-                android.R.layout.simple_list_item_1, notes
-            )
-            binding.listView.adapter = adapter
-        }
-    }
+//    private fun getAllNotes() {
+//        mNotesDao.allNotes.observe(this) { notes ->
+//            val adapter: ArrayAdapter<Note> = ArrayAdapter<Note>(
+//                this,
+//                android.R.layout.simple_list_item_1, notes
+//            )
+//            binding.listView.adapter = adapter
+//        }
+//    }
     private fun insert(note: Note) {
         executorService.execute { mNotesDao.insert(note) }
     }
@@ -99,10 +104,10 @@ class MainActivity : AppCompatActivity() {
         executorService.execute { mNotesDao.update(note) }
     }
 
-    override fun onResume() {
-        super.onResume()
-        getAllNotes()
-    }
+//    override fun onResume() {
+//        super.onResume()
+//        getAllNotes()
+//    }
 
     private fun setEmptyField() {
         with(binding){
